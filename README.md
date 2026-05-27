@@ -1,6 +1,7 @@
 ## Project title
 
 ## Team members
+Ethan Lai & Jayden Chen
 
 ## Project description
 
