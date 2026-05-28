@@ -13,7 +13,7 @@ ARCH 	= -march=rv64im -mabi=lp64
 ASFLAGS = $(ARCH)
 CFLAGS 	= $(ARCH) -g -Og -I$$CS107E/include $$warn $$freestanding -fno-omit-frame-pointer -fstack-protector-strong
 LDFLAGS = -nostdlib -L$$CS107E/lib -T memmap.ld
-LDLIBS 	= -lmango -lmango_gcc
+LDLIBS 	= -lmango -lextra -lmango_gcc
 
 OBJECTS = $(addsuffix .o, $(basename $(SOURCES)))
 
