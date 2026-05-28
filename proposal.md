@@ -1,25 +1,38 @@
-## Title of your project
+# AirTone
 
 ## Team members
+- Jayden Chen
+- Ethan Lai
 
 ## Project goals
-Short description of project idea and end goal you are aiming for.
-Include stretch goals and/or fallback position to indicate how you 
-might fine-tune the project scope if needed.
+
+The inspiration for our project is to create a basic Theremin using speakers and an ultrasound sensor. As a baseline, we hope to be able to control pitch using our hand's distance from the sensor. For extension, we could add other sensors such as sliders, buttons, or potentially an accelerometer / gyroscope to add reverb or simulate different sounds. 
 
 ## Resources, budget
-Itemize components/materials you will need and plan for acquiring them.
-We can reimburse cost of parts up to $20 per person.
+
+### Core:
+- I2S to analog: PCM5102 and/or MAX98357A
+- Analog to I2C: ADS1115
+- Ultrasonic Sensor: WWZMDiB
+- Speakers (salvaged from lab64 / home parts)
+
+### Additions:
+- Potentiometers
+- Buttons
+- Touch sensor
+- Accelerometer / Gyroscope
 
 ## Tasks, member responsibilities
-Each team member should be responsible for a clearly identifiable part of the project.
+- Tone generation / sound effects using I2S (Jayden)
+- Sensor reading / calibration using I2C (Ethan)
+- Integration using interrupts (Jayden / Ethan)
 
 ## Schedule, midpoint milestones
-Sketch a timeline for steady progress across full project period
-Order tasks so as to resolve unknowns/risks sooner than later
-What are the one-week goals you will complete by next lab meeting?
+- Milestone 1 (05/29 EOD): Software using existing modules for I2S and I2C 
+- Milestone 2 (06/02 EOD): Initial integration with ultrasonic sensor
+- Milestone 3 (06/05 EOD): Addition of potentiometers, switches, other sensors / effects
+- Milestone 4 (06/07 EOD): Integration / casing complete
+- Milestone 5 (06/09 EOD): Final presentation prep
 
 ## Additional resources, issues
-Are there books/code/tools that you need access to?
-What are the possible risks to overcome? What are you concerned about? 
-How can we help you succeed?
+- We will be using the provided I2S and I2C modules.
