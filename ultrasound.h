@@ -13,6 +13,8 @@
 #define TRIG_GPIO GPIO_PB3
 #define ECHO_GPIO GPIO_PB4
 
+#define MAX_RANGE (396) // 13 feet -> 396 cm max range
+
 /* Type: 'ultrasound_device_t'
 *
 * This typedef gives a nickname to the struct that will be used to represent a single 
