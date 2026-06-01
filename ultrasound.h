@@ -35,3 +35,10 @@ typedef struct ultrasound_device ultrasound_device_t;
 * @return              pointer to new ultrasound device or NULL if failed to create
 */
 ultrasound_device_*t ultrasound_new(gpio_id_t trig, gpio_id_t echo);
+
+/* 'ultrasound_read'
+*
+* Read (blocking) a single distance measurement from the specified ultrasound device.
+*
+*/
+unsigned long ultrasound_read(ultrasound_device_t* dev);
