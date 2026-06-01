@@ -4,7 +4,7 @@
 # Link against your libmango + reference libmango (edit LDLIBS, LDFLAGS to change)
 
 PROGRAM = main.bin
-SOURCES = $(PROGRAM:.bin=.c) mymodule.c
+SOURCES = $(PROGRAM:.bin=.c) speaker.c math.c
 
 all: $(PROGRAM)
 
@@ -13,7 +13,7 @@ ARCH 	= -march=rv64im -mabi=lp64
 ASFLAGS = $(ARCH)
 CFLAGS 	= $(ARCH) -g -Og -I$$CS107E/include $$warn $$freestanding -fno-omit-frame-pointer -fstack-protector-strong
 LDFLAGS = -nostdlib -L$$CS107E/lib -T memmap.ld
-LDLIBS 	= -lmango -lmango_gcc
+LDLIBS 	= -lmango -lmango_gcc -lextra
 
 OBJECTS = $(addsuffix .o, $(basename $(SOURCES)))
 
