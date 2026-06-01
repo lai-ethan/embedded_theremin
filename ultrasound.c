@@ -91,6 +91,16 @@ void start_read_pitch(ultrasound_device_t* dev) {
     gpio_write(dev->trigger, 0); 
 }
 
+// sample code:
+//
+//    if (read_pitch) {
+//	start_read_pitch(dev);
+//    }
+//
+//    if (dev->is_ready) {
+//	distance = ultrasound_calc_distance(dev);
+//    }
+//
 // called from main once dev->is_ready = true
 unsigned long calc_distance(ultrasound_device_t* dev) {
     dev->is_ready = false;
