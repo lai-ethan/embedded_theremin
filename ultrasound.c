@@ -4,11 +4,12 @@
 * implemented functions described by ultrasound.h
 */
 
-#include "ulrasound.h"
+#include "ultrasound.h"
 #include "interrupts.h"
 #include "timer.h"
 #include "gpio_extra.h"
 #include "gpio_interrupt.h"
+#include "malloc.h"
 
 
 /*
@@ -19,7 +20,7 @@
 struct ultrasound_device {
     gpio_id_t trigger;
     gpio_id_t echo;
-    unsigned long rise_time; // interrupts
+    unsigned long start_time; // interrupts
     unsigned long end_time;
     bool is_ready;
 };
@@ -30,8 +31,8 @@ void handle_distance(void* aux_data) {
     gpio_interrupt_clear(dev->echo);
 
     if (gpio_read(dev->echo) == 1) { // if rising edge then get start time
-	dev->rise_time = timer_get_ticks(); 
-    } else if (gpio_read(dev->echo) == 0) // if falling edge get end time
+	dev->start_time = timer_get_ticks(); 
+    } else if (gpio_read(dev->echo) == 0) { // if falling edge get end time
 	dev->end_time = timer_get_ticks();
 	dev->is_ready = true;
   	
@@ -39,10 +40,10 @@ void handle_distance(void* aux_data) {
 }
 
 ultrasound_device_t* ultrasound_new(gpio_id_t TRIG_GPIO, gpio_id_t ECHO_GPIO) {
-    gpio_device_t* dev = malloc(sizeof(*dev));
+    ultrasound_device_t* dev = malloc(sizeof(*dev));
 
-    dev->trig = TRIG_GPIO;
-    gpio_set_output(dev->trig);
+    dev->trigger = TRIG_GPIO;
+    gpio_set_output(dev->trigger);
 
     dev->echo = ECHO_GPIO;
     gpio_set_input(dev->echo);

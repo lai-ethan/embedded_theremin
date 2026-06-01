@@ -34,7 +34,7 @@ typedef struct ultrasound_device ultrasound_device_t;
 * @param echo          the id of gpio connected to the echo line of the ultrasound device
 * @return              pointer to new ultrasound device or NULL if failed to create
 */
-ultrasound_device_*t ultrasound_new(gpio_id_t trig, gpio_id_t echo);
+ultrasound_device_t* ultrasound_new(gpio_id_t trig, gpio_id_t echo);
 
 /* 'ultrasound_read'
 *
