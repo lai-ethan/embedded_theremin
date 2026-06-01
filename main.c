@@ -141,7 +141,9 @@ void main(void) {
             curr_samples = samples;
         }
 
-        // Simulare Siren
+        // Update Frequency based on interrupt
+
+        // Test: Simulare Siren
         // freq -= 10 * increment;
 
         // if (freq == 0) {
@@ -150,6 +152,7 @@ void main(void) {
         // if (freq == 1000) {
         //     increment = 1;
         // }
+
         
         // Wait till sample is sent        
         i2s_await();
