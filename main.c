@@ -5,6 +5,8 @@
 #include "uart.h"
 #include "math.h"
 #include "malloc.h"
+#include "ultrasound.h"
+#include "strings.h"
 
 #define PI 3.14159265358979323846f
 
@@ -74,14 +76,27 @@ void gen_sample_fast (int16_t samples[], int num_samples, float frequency, int a
     
 }
 
-void main(void) {
+static void show_reading(unsigned long cm) {
+    if (cm > MAX_RANGE) return; // don't print anything if nothing deteted
+    char buf[MAX_RANGE+1];
+    memset(buf, '-', sizeof(buf));
+    buf[cm] = '|';
+    buf[cm+1] = '\0';
+    printf("%s %ld\n", buf, cm);
+}
 
+void main(void) {
+    timer_init();
+    gpio_init();
     uart_init();
     dma_init();
     i2s_init(SAMPLE_RATE);
 
+    ultrasound_device_t* dev = ultrasound_new(TRIG_GPIO, ECHO_GPIO);
+    printf("STARTING READING\n");
+    
     // Initialize sound generation
-    int duration_ms = 100;
+    int duration_ms = 130;
     i2s_frame_type_t ftype = I2S_STEREO;
 
     // Initialize sin table
@@ -102,9 +117,9 @@ void main(void) {
     bool read_vol = true;
 
     // Sound generation params 
-    int amplitude = 16000;
-    float freq = 1000;
-    // int increment = 1;
+    int amplitude = 500;
+    float freq = 400;
+    int increment = 1;
     
     // Sample pointers
     int16_t * update_samples = new_samples;
@@ -115,21 +130,19 @@ void main(void) {
 
     while (true) {
 
-        // Read from ultrasonic sensors if flag is true
-        // if (read_pitch) {
-        //     start_read_pitch();   
-        // }
-        // if (read_vol) {
-        //     start_read_vol();   
-        // }
-
-        // Effects
-        // read_reverb();
-        // read_base();
-        
         // Generate sample and play sound
         i2s_stream_playback_nb(curr_samples, num_samples, ftype);
-        gen_sample_fast(update_samples, num_samples, freq, amplitude, ftype);
+                
+        // Update frequency / amplitude based on interrupts
+        unsigned long cm = ultrasound_read(dev) / 50;
+  	    show_reading(cm);
+
+        if (cm < 3000) {
+            gen_sample_fast(update_samples, num_samples, cm, amplitude, ftype);
+        }
+        else {
+            gen_sample_fast(update_samples, num_samples, freq, amplitude, ftype);
+        }
 
         // Switch sample
         if (update_samples == new_samples) {
@@ -141,19 +154,6 @@ void main(void) {
             curr_samples = samples;
         }
 
-        // Update frequency / amplitude based on interrupts
-
-        // Test: Simulare Siren
-        // freq -= 10 * increment;
-
-        // if (freq == 0) {
-        //     increment = -1;
-        // }
-        // if (freq == 1000) {
-        //     increment = 1;
-        // }
-
-        
         // Wait till sample is sent        
         i2s_await();
 
