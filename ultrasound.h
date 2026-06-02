@@ -44,3 +44,9 @@ ultrasound_device_t* ultrasound_new(gpio_id_t trig, gpio_id_t echo);
 *
 */
 unsigned long ultrasound_read(ultrasound_device_t* dev);
+
+void start_read_pitch(ultrasound_device_t* dev);
+
+unsigned long ultrasound_calc_distance(ultrasound_device_t* dev);
+
+bool ultrasound_is_ready(ultrasound_device_t* dev);

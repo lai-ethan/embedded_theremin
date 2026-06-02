@@ -26,7 +26,7 @@ struct ultrasound_device {
 };
 
 // interrupt handler for both rising edge and falling edge of echo line
-void handle_distance(void* aux_data) {
+static void handle_distance(void* aux_data) {
     ultrasound_device_t* dev = (ultrasound_device_t*)aux_data;
     gpio_interrupt_clear(dev->echo);
 
@@ -49,7 +49,7 @@ ultrasound_device_t* ultrasound_new(gpio_id_t TRIG_GPIO, gpio_id_t ECHO_GPIO) {
     gpio_set_input(dev->echo);
     gpio_set_pullup(dev->echo);
 
-     interrupts
+     //interrupts
      dev->start_time = 0;
      dev->end_time = 0;
      dev->is_ready = false;
@@ -103,8 +103,12 @@ void start_read_pitch(ultrasound_device_t* dev) {
 //    }
 //
 // called from main once dev->is_ready = true
-unsigned long calc_distance(ultrasound_device_t* dev) {
+unsigned long ultrasound_calc_distance(ultrasound_device_t* dev) {
     dev->is_ready = false;
     unsigned long pulse_width = (dev->end_time - dev->start_time) / TICKS_PER_USEC;
-    return pulse_width / 58; // 58 for cm or 148 for inch
+    return pulse_width / 58; // 58 for cm, 148 for inch
+}
+
+bool ultrasound_is_ready(ultrasound_device_t* dev) {
+    return dev->is_ready;
 }
