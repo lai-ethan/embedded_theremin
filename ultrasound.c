@@ -49,14 +49,14 @@ ultrasound_device_t* ultrasound_new(gpio_id_t TRIG_GPIO, gpio_id_t ECHO_GPIO) {
     gpio_set_input(dev->echo);
     gpio_set_pullup(dev->echo);
 
-    // interrupts
-    // dev->start_time = 0;
-    // dev->end_time = 0;
-    // dev->is_ready = false;
+     interrupts
+     dev->start_time = 0;
+     dev->end_time = 0;
+     dev->is_ready = false;
 
-    // gpio_interrupt_init(); // config gpio interrupts
-    // gpio_interrupt_config(dev->echo, GPIO_INTERRUPT_DOUBLE_EDGE, false); // debounce?
-    // gpio_interrupt_set_handler(dev->echo, handle_distance, dev); // set handler
+     gpio_interrupt_init(); // config gpio interrupts
+     gpio_interrupt_config(dev->echo, GPIO_INTERRUPT_DOUBLE_EDGE, false); // debounce?
+     gpio_interrupt_set_handler(dev->echo, handle_distance, dev); // set handler
 
     return dev;
 }

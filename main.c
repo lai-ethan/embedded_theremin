@@ -34,6 +34,6 @@ void main(void) {
 	//  }
 	unsigned long cm = ultrasound_read(dev);
   	show_reading(cm);
-        timer_delay_ms(250);
+        timer_delay_us(60);
     }
 }
