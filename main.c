@@ -141,7 +141,7 @@ void main(void) {
             curr_samples = samples;
         }
 
-        // Update Frequency based on interrupt
+        // Update frequency / amplitude based on interrupts
 
         // Test: Simulare Siren
         // freq -= 10 * increment;

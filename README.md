@@ -5,6 +5,7 @@ Ethan Lai & Jayden Chen
 
 ## Project description
 
+
 ## Member contribution
 A short description of the work performed by each member of the team.
 
