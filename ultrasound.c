@@ -35,7 +35,6 @@ static void handle_distance(void* aux_data) {
     } else if (gpio_read(dev->echo) == 0) { // if falling edge get end time
 	dev->end_time = timer_get_ticks();
 	dev->is_ready = true;
-  	
     }
 }
 
