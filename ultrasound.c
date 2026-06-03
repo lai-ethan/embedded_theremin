@@ -22,6 +22,8 @@ struct ultrasound_device {
     unsigned long start_time; // interrupts
     unsigned long end_time;
     bool is_ready;
+    unsigned long prev_1_read;
+    unsigned long prev_2_read;
 };
 
 // interrupt handler for both rising edge and falling edge of echo line
@@ -50,24 +52,62 @@ ultrasound_device_t* ultrasound_new(gpio_id_t TRIG_GPIO, gpio_id_t ECHO_GPIO) {
     gpio_set_input(dev->echo);
     gpio_set_pullup(dev->echo);
 
+    dev->prev_1_read = -1;
+    dev->prev_2_read = -1;
+    
     return dev;
 }
 
 // wait 60ms between each reading to prevent corruption of reading
-unsigned long ultrasound_read(ultrasound_device_t* dev) {
+unsigned long ultrasound_read(ultrasound_device_t* dev, int timeout) {
 
     gpio_write(dev->trigger, 1); // set trig high for ~10 us
     timer_delay_us(10);
     gpio_write(dev->trigger, 0);
+    
+    int curr_ticks = timer_get_ticks();
 
-    while (gpio_read(dev->echo) != 1) ; // wait until high
+    while (gpio_read(dev->echo) != 1) {
+        if (timer_get_ticks() - curr_ticks > timeout) {
+            return -2;
+        }
+    }; // wait until high
     unsigned long start_time = timer_get_ticks(); // get start time
 
-    while (gpio_read(dev->echo) == 1) ; // while echo held high
+    while (gpio_read(dev->echo) == 1) {
+        if (timer_get_ticks() - start_time > timeout) {
+            return -2;
+        }
+    }; // while echo held high
+
     unsigned long end_time = timer_get_ticks(); // get end time
 
     unsigned long pulse_width = (end_time - start_time);
     unsigned long distance = pulse_width; // 58 for cm or 148 for inch
 
     return distance;
+}
+
+
+// wait 60ms between each reading to prevent corruption of reading
+unsigned long ultrasound_read_filtered(ultrasound_device_t* dev, int timeout) {
+    unsigned long curr_read = ultrasound_read(dev, timeout);
+    unsigned long ans = curr_read;
+
+    if (dev->prev_1_read == -1 || dev->prev_2_read == -1) { }
+    else {
+        if ( (dev->prev_2_read <= curr_read && dev->prev_2_read >= dev->prev_1_read) ||
+            (dev->prev_2_read >= curr_read && dev->prev_2_read <= dev->prev_1_read) ) {
+            ans = dev->prev_2_read;
+        }
+        else if ( (dev->prev_1_read <= curr_read && dev->prev_1_read >= dev->prev_2_read) ||
+            (dev->prev_1_read >= curr_read && dev->prev_1_read <= dev->prev_2_read) ) {
+            ans = dev->prev_1_read;
+        }
+    }
+    
+    dev->prev_2_read = dev->prev_1_read;
+    dev->prev_1_read = curr_read;
+
+    return ans;
 }

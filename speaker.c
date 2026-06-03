@@ -53,8 +53,6 @@ int count_num_samples (int duration_ms, i2s_frame_type_t ftype) {
 
 void gen_sample_fast (int16_t samples[], int num_samples, float frequency, int amplitude, i2s_frame_type_t ftype) {
     float phase_step = LUT_SIZE * frequency / SAMPLE_RATE;
-
-    printf("Start");
     
     if (ftype == I2S_STEREO) {
         for (int i = 0; i < num_samples-1; i+=2) {
@@ -81,7 +79,5 @@ void gen_sample_fast (int16_t samples[], int num_samples, float frequency, int a
            }
         }
     }
-
-    printf("Done");
     
 }

@@ -63,7 +63,7 @@
 #define TRIG_GPIO GPIO_PB11
 #define ECHO_GPIO GPIO_PB12
 
-#define MAX_RANGE (396) // 13 feet -> 396 cm max range
+#define MAX_RANGE (1000) // 13 feet -> 396 cm max range
 
 /* Type: 'ultrasound_device_t'
 *
@@ -93,10 +93,12 @@ ultrasound_device_t* ultrasound_new(gpio_id_t trig, gpio_id_t echo);
 * Read (blocking) a single distance measurement from the specified ultrasound device.
 *
 */
-unsigned long ultrasound_read(ultrasound_device_t* dev);
+unsigned long ultrasound_read(ultrasound_device_t* dev, int timeout);
 
 void start_read_pitch(ultrasound_device_t* dev);
 
 unsigned long ultrasound_calc_distance(ultrasound_device_t* dev);
 
 bool ultrasound_is_ready(ultrasound_device_t* dev);
+
+unsigned long ultrasound_read_filtered(ultrasound_device_t* dev, int timeout);

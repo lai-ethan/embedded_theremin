@@ -20,18 +20,26 @@ typedef struct {
 
 distance_params params = {
     .min_freq = 0,
-    .max_freq = 1000,
-    .min_dist = 3,
-    .max_dist = 200,
+    .max_freq = 1000
 };
 
 static void show_reading(unsigned long cm) {
-    if (cm > MAX_RANGE) return; // don't print anything if nothing deteted
-    char buf[MAX_RANGE+1];
-    memset(buf, '-', sizeof(buf));
-    buf[cm] = '|';
-    buf[cm+1] = '\0';
-    printf("%s %ld\n", buf, cm);
+    
+    // if (cm > MAX_RANGE) return; // don't print anything if nothing deteted
+    // char buf[MAX_RANGE+1];
+    // memset(buf, '-', sizeof(buf));
+    // buf[cm] = '|';
+    // buf[cm+1] = '\0';
+    // printf("%s %ld\n", buf, cm);
+    printf("%ld\n", cm);
+}
+
+static float time_ticks (unsigned long cm) {
+    cm /= 80;
+
+    float normalized = ((float) cm - params.min_freq) / (params.max_freq - params.min_freq);
+    float curve = 1 - (1 - normalized) * (1 - normalized) * (1 - normalized);
+    return params.min_freq + ( curve * (params.max_freq - params.min_freq));
 }
 
 void main(void) {
@@ -41,6 +49,8 @@ void main(void) {
     speaker_init();
 
     ultrasound_device_t* dev = ultrasound_new(TRIG_GPIO, ECHO_GPIO);
+    // ultrasound_device_t* dev = ultrasound_new(TRIG_GPIO, ECHO_GPIO);
+
     printf("STARTING READING\n");
     
     // Initialize sound generation
@@ -55,9 +65,10 @@ void main(void) {
     int16_t * new_samples = malloc(sizeof(int16_t) * num_samples);
 
     // Sound generation params 
-    int amplitude = 500;
+    int amplitude = 800;
     float freq = 400;
-    
+    float freq_dynamic = freq;
+
     // Sample pointers
     int16_t * update_samples = new_samples;
     int16_t * curr_samples = samples; 
@@ -71,15 +82,14 @@ void main(void) {
         i2s_stream_playback_nb(curr_samples, num_samples, ftype);
                 
         // Update frequency / amplitude based on interrupts
-        unsigned long cm = ultrasound_read(dev) / 50;
-  	    show_reading(cm);
+        unsigned long cm = ultrasound_read_filtered(dev, 50000);
 
-        if (cm < 3000) {
-            gen_sample_fast(update_samples, num_samples, cm, amplitude, ftype);
+        if (cm < 50000 && cm != -2) {
+            freq_dynamic = time_ticks(cm);
         }
-        else {
-            gen_sample_fast(update_samples, num_samples, freq, amplitude, ftype);
-        }
+  	    // show_reading(freq_dynamic);
+
+        gen_sample_fast(update_samples, num_samples, freq_dynamic, amplitude, ftype);
 
         // Switch sample
         if (update_samples == new_samples) {
