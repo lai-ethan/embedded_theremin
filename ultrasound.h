@@ -42,11 +42,36 @@ ultrasound_device_t* ultrasound_new(gpio_id_t trig, gpio_id_t echo);
 *
 * Read (blocking) a single distance measurement from the specified ultrasound device.
 *
+* @param dev          id of ultrasound device
+* @return             distance measurement as an unsigned long
 */
 unsigned long ultrasound_read(ultrasound_device_t* dev);
 
+/* 'start_read_pitch'
+*
+* writes to the trigger line for a total of 10us, telling the ultrasound device to raise its echo line and measure
+* distance. Used with interrupts instead of polling
+*
+* @param dev          id of ultrasound device 
+*/
 void start_read_pitch(ultrasound_device_t* dev);
 
+/* 'ultrasound_calc_distance'
+*
+* function to be called from main once ultrasound_is_ready = True. Calculates distance using echo timing in cm.
+* Used with interrupts instead of polling
+*
+* @param dev          id of ultrasound device
+* @return             distance measurement as an unsigned long
+*/ 
 unsigned long ultrasound_calc_distance(ultrasound_device_t* dev);
 
+/* 'ultrasound_is_ready'
+*
+* function to be called from main to check if dev->isready = true (echo line went from high->low, meaning we can 
+* calculate distance using pulse length). Used with interrupts instead of polling
+*
+* @param dev         id of ultrasound device
+* @return            whether dev->is_ready is true or false
+*/
 bool ultrasound_is_ready(ultrasound_device_t* dev);
