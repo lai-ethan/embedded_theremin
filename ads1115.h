@@ -7,7 +7,7 @@
 #include "i2c.h"
 
 // enumeration for wired channel of ads1115 device
-typdef enum {
+typedef enum {
     AIN0 = 0,
     AIN1 = 1,
     AIN2 = 2,
@@ -15,12 +15,12 @@ typdef enum {
 } ads_input_t;
 
 // clockspeed for i2c devices
-#define RATE I2C_100KHZ;
+#define RATE I2C_100KHZ
 
 // config register of ads1115
-#define CONFIG_REG 0b00000001;
+#define CONFIG_REG 0b00000001
 
-#define CONVERSION_REG 0b00000000;
+#define CONVERSION_REG 0b00000000
 
 /*
 * 'ads_device_t'
@@ -42,10 +42,11 @@ void ads_init(i2c_clk_freq_t rate);
 *
 * creates a new ads1115 device for the given I2c address/id. Must run before attempting to read/write from the device
 *
-* @param addr           I2c address of the ads device (GND: 0b1001000)
+* @param addr           I2C address of the ads device (GND: 0b1001000)
+* @param input          input address of ads wiring (AIN0, AIN1, AIN2, AIN3) 
 * @return               id of newly created ads device
 */
-ads_device_t* ads_new(uint8_t addr);
+ads_device_t* ads_new(uint8_t addr, ads_input_t input);
 
 /* 'ads_config_for_channel'
 *
@@ -98,4 +99,4 @@ bool ads_read_conversion(ads_device_t* dev);
 * @param dev         id of the ads device
 * @return            raw analogc->digital value as an int
 */
-int ads_read_channel(ads_device_t* dev);
+uint16_t ads_read_channel(ads_device_t* dev);
