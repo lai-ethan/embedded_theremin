@@ -16,6 +16,13 @@ int LUT_SIZE = 1024;
 
 float *sin_table;
 float phase = 0;
+float phase_3 = 0;
+float phase_5 = 0;
+
+float vibrato_phase = 0;
+float vibrato_phase_3 = 0;
+float vibrato_phase_5 = 0;
+
 
 void speaker_init (void);
 int count_num_samples (int duration_ms, i2s_frame_type_t ftype);
@@ -52,32 +59,108 @@ int count_num_samples (int duration_ms, i2s_frame_type_t ftype) {
 }
 
 void gen_sample_fast (int16_t samples[], int num_samples, float frequency, int amplitude, i2s_frame_type_t ftype) {
+    
     float phase_step = LUT_SIZE * frequency / SAMPLE_RATE;
     
+    float vibrato_phase_step = LUT_SIZE * 10.0f / SAMPLE_RATE;
+    float vibrato_depth = LUT_SIZE * 15.0f / SAMPLE_RATE;
+
     if (ftype == I2S_STEREO) {
         for (int i = 0; i < num_samples-1; i+=2) {
-           
-           samples[i] = (int) (amplitude * sin_table[(int) phase]);
+                      
+           samples[i] = (int) ( (amplitude * sin_table[(int) phase]));
            samples[i+1] = samples[i];
         
-           phase += phase_step;
+           float modifier = (vibrato_depth * sin_table[(int) vibrato_phase]);
+
+           phase += phase_step + modifier;
+           vibrato_phase += vibrato_phase_step;
 
            if (phase > LUT_SIZE) {
-               phase = phase - LUT_SIZE;
+               phase -= LUT_SIZE;
            }
-
+           
+           if (vibrato_phase > LUT_SIZE) {
+               vibrato_phase -= LUT_SIZE;
+           }
         }
     }
     else {
         for (int i = 0; i < num_samples; i++) {
            samples[i] = (int) (amplitude * sin_table[(int) phase]);
        
-           phase += phase_step;
+           float modifier = (vibrato_depth * sin_table[(int) vibrato_phase]);
+           
+           phase += phase_step + modifier;
+           vibrato_phase += vibrato_phase_step;
 
            if (phase > LUT_SIZE) {
-               phase = phase - LUT_SIZE;
+               phase -= LUT_SIZE;
+           }
+           
+           if (vibrato_phase > LUT_SIZE) {
+               vibrato_phase -= LUT_SIZE;
            }
         }
     }
     
 }
+
+void gen_sample_fast_chord (int16_t samples[], int num_samples, float frequency, int amplitude, i2s_frame_type_t ftype) {
+    float phase_step = LUT_SIZE * frequency / SAMPLE_RATE;
+    float phase_step_3 = LUT_SIZE * (frequency * 1.26) / SAMPLE_RATE;
+    float phase_step_5 = LUT_SIZE * (frequency * 1.50) / SAMPLE_RATE;
+    
+    float vibrato_phase_step = LUT_SIZE * 10.0f / SAMPLE_RATE;
+    float vibrato_depth = LUT_SIZE * 15.0f / SAMPLE_RATE;
+    
+    if (ftype == I2S_STEREO) {
+        for (int i = 0; i < num_samples-1; i+=2) {
+           
+           samples[i] = (int) ( ( (amplitude * sin_table[(int) phase]) + (amplitude * sin_table[(int) phase_3]) + (amplitude * sin_table[(int) phase_5])) / 3);
+           samples[i+1] = samples[i];
+           
+           float modifier = (vibrato_depth * sin_table[(int) vibrato_phase]);
+
+           phase += phase_step + modifier;
+           phase_3 += phase_step_3 + modifier;
+           phase_5 += phase_step_5 + modifier;
+           vibrato_phase += vibrato_phase_step;
+
+           
+           if (vibrato_phase > LUT_SIZE) {
+               vibrato_phase -= LUT_SIZE;
+           }
+           if (phase > LUT_SIZE) {
+               phase = phase - LUT_SIZE;
+           }
+           if (phase_3 > LUT_SIZE) {
+               phase_3 = phase_3 - LUT_SIZE;
+           }
+           if (phase_5 > LUT_SIZE) {
+               phase_5 = phase_5 - LUT_SIZE;
+           }
+        }
+    }
+    else {
+        for (int i = 0; i < num_samples; i++) {
+           samples[i] = (int) ( ( (amplitude * sin_table[(int) phase]) + (amplitude * sin_table[(int) phase_3]) + (amplitude * sin_table[(int) phase_5])) / 3);
+        
+           phase += phase_step;
+           phase_3 += phase_step_3;
+           phase_5 += phase_step_5;
+
+           if (phase > LUT_SIZE) {
+               phase = phase - LUT_SIZE;
+           }
+           if (phase_3 > LUT_SIZE) {
+               phase_3 = phase_3 - LUT_SIZE;
+           }
+           if (phase_5 > LUT_SIZE) {
+               phase_5 = phase_5 - LUT_SIZE;
+           }
+        }
+    }
+    
+}
+

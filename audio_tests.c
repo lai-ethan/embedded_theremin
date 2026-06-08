@@ -236,3 +236,64 @@ void main(void) {
 
 
 }
+
+
+// void add_base(int16_t * samples, int16_t * new_samples, int num_samples, float alpha, float gain) {
+    
+//     // Filter out frequencies
+//     for (int n = 0; n < num_samples; n++) {
+//         if (n == 0) {
+//             new_samples[n] = 0;
+//             continue;
+//         }
+//         new_samples[n] = alpha * samples[n];
+//         new_samples[n] += (1 - alpha) * new_samples[n-1];
+//     }
+
+//     // Add gain
+//     for (int n = 0; n < num_samples; n++) {
+//         new_samples[n] = new_samples[n] * gain + samples[n] * 0.2;
+//     }
+// }
+
+// void add_reverb(int16_t samples[], int16_t new_samples[], int num_samples, int delay, float gain) {
+    
+//     if (delay >= num_samples) {
+//         return;
+//     }
+
+//     for (int n = 0; n < delay; n++) {
+//         new_samples[n] = samples[n];
+//     }
+
+//     for (int n = delay; n < num_samples; n++) {
+//         new_samples[n] = samples[n] + gain * new_samples[n - delay];
+//     }
+// }
+
+// void main(void) {
+//     uart_init();
+//     dma_init();
+//     i2s_init(I2S_48KHZ);
+    
+//     ultrasound_device_t* dev_freq = ultrasound_new(GPIO_PB12, GPIO_PB11);
+//     int sample_freq = gwav_6->frames_per_sec;
+    
+//     i2s_init(sample_freq);
+//     i2s_frame_type_t ftype = (gwav_6->samples_per_frame == 1) ? I2S_MONO : I2S_STEREO;
+
+//     int16_t * curr_sample = gwav_6->data;
+//     int16_t * new_sample = gwav_6->data;
+
+//     int count = 5000;
+
+//     while (true) {
+//         for (int i = 0; i < gwav_6->n_data - count; i+= count) {
+//             i2s_stream_playback_nb(&curr_sample[i], count, ftype);
+//             new_sample = update_frequency_song(dev_freq, curr_sample, 50000);
+//             curr_sample = new_sample;
+//             // printf("Looping");
+//             i2s_await();
+//         }
+//     }
+// }
