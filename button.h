@@ -5,6 +5,9 @@
 * knows if the button has been pressed
 */
 
+#include "gpio.h"
+#include <stdbool.h>
+
 /* Type: 'button_t'
 *
 * This typedef gives a nickname to the struct that will be used to represent a single button device.
