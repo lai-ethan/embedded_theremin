@@ -23,7 +23,7 @@ struct button_device {
 static void button_pressed(void* aux_data) {
     button_device_t* dev = (button_device_t*)aux_data;
     gpio_interrupt_clear(dev->button);
-    dev->pressed = true;
+    dev->pressed = !dev->pressed;
 }
 
 // initializes new button device and configures interrupts for it
@@ -46,6 +46,6 @@ button_device_t* button_new(gpio_id_t pin) {
 // function called by main to check whether the button has been pressed or not
 bool is_button_pressed(button_device_t* dev) {
     bool result = dev->pressed;
-    dev->pressed = false;
+    dev->pressed = !dev->pressed;
     return result;
 }
