@@ -245,10 +245,11 @@ void main(void) {
     vib_params params = {0, 0};
     
     int count = 5000;
+    
     if (song) {
         curr_samples = gwav_6->data;
-        update_samples = gwav_6->data;
     }
+
     else {
         // Initialize
         gen_sample_fast(samples, num_samples, freq, amp, ftype, params.vib_freq, params.vib_depth);
@@ -260,8 +261,7 @@ void main(void) {
 
             for (int i = 0; i < gwav_6->n_data - count; i+= count) {
                 i2s_stream_playback_nb(&curr_samples[i], count, ftype);
-                update_samples = update_frequency_song(dev_freq, update_samples, 50000);
-                curr_samples = update_samples;
+                curr_samples = update_frequency_song(dev_freq, update_samples, 50000);
                 i2s_await();
             }
             
