@@ -9,6 +9,7 @@
 #include "strings.h"
 #include "speaker.h"
 #include "ads1115.h"
+#include "button.h"
 
 #include "sound_files/Xmas_minus_6.h"
 #include "sound_files/Xmas_original.h"
@@ -213,9 +214,19 @@ void main(void) {
     uint16_t conversion_vib = 0;
     uint16_t conversion_pitch = 0;
 
+    //****  interrupts
+    interrupts_init();
+
     // Initialize ultrasound devices
     ultrasound_device_t* dev_freq = ultrasound_new(GPIO_PB12, GPIO_PB11);
     ultrasound_device_t* dev_amp = ultrasound_new(GPIO_PD22, GPIO_PD21);
+
+    button_device_t* scale_button = button_new(GPIO_PD11);
+    button_device_t* chord_button = button_new(GPIO_PD12);
+    button_device_t* song_button = button_new(GPIO_PD13);
+ 
+    //****  interrupts
+     interrupts_global_enable();
     
     // Initialize sound generation
     int duration_ms = 100;
@@ -237,9 +248,9 @@ void main(void) {
     int16_t * curr_samples = samples; 
 
     // Chord and scale modes
-    bool chord = false;
-    bool scale = false;
-    bool song = true;
+   //  bool chord = false;
+   //  bool scale = false;
+   //  bool song = false;
 
     // Parameters
     vib_params params = {0, 0};
@@ -259,7 +270,7 @@ void main(void) {
     
     while (true) {
         
-        if (song) {
+        if (is_button_pressed(song_button)) {
 
             for (int i = 0; i < gwav_6->n_data - count; i+= count) {
                 i2s_stream_playback_nb(&curr_samples[i], count, ftype);
@@ -284,7 +295,7 @@ void main(void) {
             conversion_pitch = ads_read_channel_vol(dev_pitch, conversion_pitch);
                     
             // Update Frequency
-            if (scale) {
+            if (is_button_pressed(scale_button)) {
                 freq_dynamic = update_frequency_scale(dev_freq, freq_dynamic, 50000, conversion_pitch);
                 amp_dynamic = update_amplitude_scale(dev_amp, 50000);
             }
@@ -295,7 +306,7 @@ void main(void) {
         
 
             // Generate New Sample
-            if (chord) {
+            if (is_button_pressed(chord_button)) {
                 gen_sample_fast_chord(update_samples, num_samples, freq_dynamic, amp_dynamic, ftype, params.vib_freq, params.vib_depth);
             }
             else {
