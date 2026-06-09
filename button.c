@@ -45,7 +45,5 @@ button_device_t* button_new(gpio_id_t pin) {
 
 // function called by main to check whether the button has been pressed or not
 bool is_button_pressed(button_device_t* dev) {
-    bool result = dev->pressed;
-    dev->pressed = !dev->pressed;
-    return result;
+    return dev->pressed;
 }
