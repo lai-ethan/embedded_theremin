@@ -24,6 +24,8 @@ struct ultrasound_device {
     bool is_ready;
     unsigned long prev_1_read;
     unsigned long prev_2_read;
+    unsigned long prev_3_read;
+    unsigned long prev_4_read;
 };
 
 // interrupt handler for both rising edge and falling edge of echo line
@@ -54,6 +56,8 @@ ultrasound_device_t* ultrasound_new(gpio_id_t TRIG_GPIO, gpio_id_t ECHO_GPIO) {
 
     dev->prev_1_read = -1;
     dev->prev_2_read = -1;
+    dev->prev_3_read = -1;
+    dev->prev_4_read = -1;
     
     return dev;
 }
