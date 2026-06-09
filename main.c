@@ -264,13 +264,13 @@ void main(void) {
     
     while (true) {
         
-        if (song) { //is_button_pressed(song_button)) {
-	    if (first) {
-                curr_samples = gwav_6->data;
-       	        // double buffer
-	        update_samples = gwav_6->data;
-	        first = false;
-             } else {
+        if (is_button_pressed(song_button)) { //is_button_pressed(song_button)) {
+	  //  if (first) {
+          //      curr_samples = gwav_6->data;
+       	  //      // double buffer
+	  //      update_samples = gwav_6->data;
+	   //     first = false;
+           //  } else {
                 for (int i = 0; i < gwav_6->n_data - count; i+= count) {
                     i2s_stream_playback_nb(&curr_samples[i], count, ftype);
 		    // single buffer
@@ -279,10 +279,15 @@ void main(void) {
 		    // double buff
                     update_samples = update_frequency_song(dev_freq, update_samples, 50000);
  	            curr_samples = update_samples; 
+                    
 
+                    if (!is_button_pressed(song_button)) {
+                        i2s_await();
+                        break;
+                    }
                     i2s_await();
                 }
-	    }
+	   // }
         }
 
         else {
@@ -290,7 +295,7 @@ void main(void) {
             i2s_stream_playback_nb(curr_samples, num_samples, ftype);
                   
             // vib_depth = ads_read_channel_vol(dev_vib, conversion_vib);
-	        params = ads_read_channel_vib(dev_vib, params);
+	    params = ads_read_channel_vib(dev_vib, params);
             conversion_pitch = ads_read_channel_vol(dev_pitch, conversion_pitch);
                     
             // Update Frequency
