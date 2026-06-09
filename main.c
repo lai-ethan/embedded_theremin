@@ -10,10 +10,12 @@
 #include "speaker.h"
 #include "ads1115.h"
 #include "button.h"
+#include "interrupts.h"
+#include "gpio_interrupt.h"
 
-#include "sound_files/Xmas_minus_6.h"
-#include "sound_files/Xmas_original.h"
-#include "sound_files/Xmas_plus_5.h"
+//#include "sound_files/Xmas_minus_6.h"
+//#include "sound_files/Xmas_original.h"
+//#include "sound_files/Xmas_plus_5.h"
 
 typedef struct {
     float min_freq;
@@ -81,7 +83,7 @@ static float convert_ticks_frequency_scale (unsigned long ticks, int scale) {
     float normalized = ((float) ticks - params.min_freq) / (params.max_freq - params.min_freq);
     int note = (int) (15 * normalized);
     float freq = 0;
-    if (freq >= 0 && freq < 8) {
+    if (note >= 0 && note < 8) {
         if (note <= 1) {
             note = 1;    
         }
@@ -112,7 +114,7 @@ static float update_frequency_scale(ultrasound_device_t* dev, float prev_freq, i
     if (ticks < threshold && ticks != -2) {
         ans = convert_ticks_frequency_scale(ticks, scale);
     }
-    
+        
     return ans;
 
 }
@@ -131,11 +133,15 @@ static float update_amplitude(ultrasound_device_t* dev, float prev_amp, int thre
 
 }
 
-static float update_amplitude_scale(ultrasound_device_t* dev, int threshold) {
+static float update_amplitude_scale(ultrasound_device_t* dev, float prev_amp, int threshold) {
 
     unsigned long ticks = ultrasound_read_filtered(dev, threshold);
+    
+    if (ticks == -2) {
+        return prev_amp; 
+    }
     ticks /= 80;
-
+    
     float normalized = ((float) ticks - params.min_freq) / (params.max_freq - params.min_freq);
 
     if (normalized < 0.5) {
@@ -157,15 +163,15 @@ static int16_t * update_frequency_song(ultrasound_device_t* dev, int16_t * prev,
     int note = (int) (9 * normalized);
     
     printf("%ld \n", ticks);
-    if (note < 2) {
-        freq = (int16_t *) gwav_0->data;
-    }
-    else if (note < 4) {
-        freq = (int16_t *) gwav_6->data;
-    }  
-    else if (note < 6) {
-        freq = (int16_t *) gwav_11->data;
-    }
+   // if (note < 2) {
+   //     freq = (int16_t *) gwav_0->data;
+   // }
+   // else if (note < 4) {
+   //     freq = (int16_t *) gwav_6->data;
+   // }  
+   // else if (note < 6) {
+   //     freq = (int16_t *) gwav_11->data;
+    //}
 
     return freq;
 
@@ -216,6 +222,7 @@ void main(void) {
 
     //****  interrupts
     interrupts_init();
+    gpio_interrupt_init();
 
     // Initialize ultrasound devices
     ultrasound_device_t* dev_freq = ultrasound_new(GPIO_PB12, GPIO_PB11);
@@ -226,10 +233,10 @@ void main(void) {
     button_device_t* song_button = button_new(GPIO_PD13);
  
     //****  interrupts
-     interrupts_global_enable();
+    interrupts_global_enable();
     
     // Initialize sound generation
-    int duration_ms = 100;
+    int duration_ms = 150;
     i2s_frame_type_t ftype = I2S_STEREO;
 
     // Set aside memory for samples
@@ -245,49 +252,33 @@ void main(void) {
 
     // Sample pointers
     int16_t * update_samples = new_samples;
-    int16_t * curr_samples = samples; 
-
-    // Chord and scale modes
-  bool chord = false;
-  bool scale = false;
-  bool song = false;
+    int16_t * curr_samples = samples;
 
     // Parameters
     vib_params params = {0, 0};
     
     int count = 5000;
-//    bool song = false; 
-    bool first = true; // first initialization of song
 
     // Initialize
     gen_sample_fast(samples, num_samples, freq, amp, ftype, params.vib_freq, params.vib_depth);
     
     while (true) {
         
-        if (is_button_pressed(song_button)) { //is_button_pressed(song_button)) {
-	  //  if (first) {
-          //      curr_samples = gwav_6->data;
-       	  //      // double buffer
-	  //      update_samples = gwav_6->data;
-	   //     first = false;
-           //  } else {
-                for (int i = 0; i < gwav_6->n_data - count; i+= count) {
-                    i2s_stream_playback_nb(&curr_samples[i], count, ftype);
-		    // single buffer
-                    //curr_samples = update_frequency_song(dev_freq, update_samples, 50000);
-		
+        if (is_button_pressed(song_button)) {
+//                for (int i = 0; i < gwav_6->n_data - count; i+= count) {
+  //                  i2s_stream_playback_nb(&curr_samples[i], count, ftype);
+//		   
 		    // double buff
-                    update_samples = update_frequency_song(dev_freq, update_samples, 50000);
- 	            curr_samples = update_samples; 
+  //                  update_samples = update_frequency_song(dev_freq, update_samples, 50000);
+ //	            curr_samples = update_samples; 
                     
 
-                    if (!is_button_pressed(song_button)) {
-                        i2s_await();
-                        break;
-                    }
-                    i2s_await();
-                }
-	   // }
+   //                 if (!is_button_pressed(song_button)) {
+     //                   i2s_await();
+       //                 break;
+         //           }
+           //         i2s_await();
+             //   }
         }
 
         else {
@@ -301,7 +292,7 @@ void main(void) {
             // Update Frequency
             if (is_button_pressed(scale_button)) {
                 freq_dynamic = update_frequency_scale(dev_freq, freq_dynamic, 50000, conversion_pitch);
-                amp_dynamic = update_amplitude_scale(dev_amp, 50000);
+                amp_dynamic = update_amplitude_scale(dev_amp, amp_dynamic, 50000);
             }
             else {
                 freq_dynamic = update_frequency(dev_freq, freq_dynamic, 50000);

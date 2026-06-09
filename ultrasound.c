@@ -19,18 +19,16 @@
 struct ultrasound_device {
     gpio_id_t trigger;
     gpio_id_t echo;
-    unsigned long start_time; // interrupts
-    unsigned long end_time;
+    volatile unsigned long start_time; // interrupts
+    volatile unsigned long end_time;
     bool is_ready;
     unsigned long prev_1_read;
     unsigned long prev_2_read;
-    unsigned long prev_3_read;
-    unsigned long prev_4_read;
 };
 
 // interrupt handler for both rising edge and falling edge of echo line
 static void handle_distance(void* aux_data) {
-    ultrasound_device_t* dev = (ultrasound_device_t*) aux_data;
+    ultrasound_device_t* dev = (ultrasound_device_t*)aux_data;
     gpio_interrupt_clear(dev->echo);
 
     if (gpio_read(dev->echo) == 1) { 
@@ -56,8 +54,6 @@ ultrasound_device_t* ultrasound_new(gpio_id_t TRIG_GPIO, gpio_id_t ECHO_GPIO) {
 
     dev->prev_1_read = -1;
     dev->prev_2_read = -1;
-    dev->prev_3_read = -1;
-    dev->prev_4_read = -1;
     
     return dev;
 }
@@ -69,17 +65,19 @@ unsigned long ultrasound_read(ultrasound_device_t* dev, int timeout) {
     timer_delay_us(10);
     gpio_write(dev->trigger, 0);
     
-    int curr_ticks = timer_get_ticks();
+    unsigned long curr_ticks = timer_get_ticks();
 
     while (gpio_read(dev->echo) != 1) {
-        if (timer_get_ticks() - curr_ticks > timeout) {
+	unsigned long now = timer_get_ticks();
+        if (now - curr_ticks > timeout) {
             return -2;
         }
     }; // wait until high
     unsigned long start_time = timer_get_ticks(); // get start time
 
     while (gpio_read(dev->echo) == 1) {
-        if (timer_get_ticks() - start_time > timeout) {
+	unsigned long now = timer_get_ticks();
+        if (now - start_time > timeout) {
             return -2;
         }
     }; // while echo held high
@@ -99,6 +97,7 @@ unsigned long ultrasound_read_filtered(ultrasound_device_t* dev, int timeout) {
     unsigned long ans = curr_read;
 
     if (dev->prev_1_read == -1 || dev->prev_2_read == -1) { }
+    else if (curr_read == -2) { return -2; }
     else {
         if ( (dev->prev_2_read <= curr_read && dev->prev_2_read >= dev->prev_1_read) ||
             (dev->prev_2_read >= curr_read && dev->prev_2_read <= dev->prev_1_read) ) {

@@ -16,7 +16,7 @@
 */
 struct button_device {
     gpio_id_t button; // gpio pin of button
-    bool pressed; // whether pushed or not
+    volatile bool pressed; // whether pushed or not
 };
 
 // interrupt handler for negative edge of button (clicked)
@@ -36,7 +36,6 @@ button_device_t* button_new(gpio_id_t pin) {
     gpio_set_input(dev->button);
     gpio_set_pullup(dev->button);
 
-    gpio_interrupt_init();
     gpio_interrupt_config(dev->button, GPIO_INTERRUPT_NEGATIVE_EDGE, true);
     gpio_interrupt_set_handler(dev->button, button_pressed, dev);
 
