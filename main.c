@@ -248,42 +248,41 @@ void main(void) {
     int16_t * curr_samples = samples; 
 
     // Chord and scale modes
-   //  bool chord = false;
-   //  bool scale = false;
-   //  bool song = false;
+  bool chord = false;
+  bool scale = false;
+  bool song = false;
 
     // Parameters
     vib_params params = {0, 0};
     
     int count = 5000;
-    
-    if (song) {
-        curr_samples = gwav_6->data;
-	// double buffer
-	update_samples = gwav_6->data;
-    }
+//    bool song = false; 
+    bool first = true; // first initialization of song
 
-    else {
-        // Initialize
-        gen_sample_fast(samples, num_samples, freq, amp, ftype, params.vib_freq, params.vib_depth);
-    }
+    // Initialize
+    gen_sample_fast(samples, num_samples, freq, amp, ftype, params.vib_freq, params.vib_depth);
     
     while (true) {
         
-        if (is_button_pressed(song_button)) {
-
-            for (int i = 0; i < gwav_6->n_data - count; i+= count) {
-                i2s_stream_playback_nb(&curr_samples[i], count, ftype);
-		// single buffer
-                //curr_samples = update_frequency_song(dev_freq, update_samples, 50000);
+        if (song) { //is_button_pressed(song_button)) {
+	    if (first) {
+                curr_samples = gwav_6->data;
+       	        // double buffer
+	        update_samples = gwav_6->data;
+	        first = false;
+             } else {
+                for (int i = 0; i < gwav_6->n_data - count; i+= count) {
+                    i2s_stream_playback_nb(&curr_samples[i], count, ftype);
+		    // single buffer
+                    //curr_samples = update_frequency_song(dev_freq, update_samples, 50000);
 		
-		// double buff
-                update_samples = update_frequency_song(dev_freq, update_samples, 50000);
- 	        curr_samples = update_samples; 
+		    // double buff
+                    update_samples = update_frequency_song(dev_freq, update_samples, 50000);
+ 	            curr_samples = update_samples; 
 
-                i2s_await();
-            }
-            
+                    i2s_await();
+                }
+	    }
         }
 
         else {
