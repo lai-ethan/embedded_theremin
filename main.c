@@ -83,7 +83,7 @@ static float convert_ticks_frequency_scale (unsigned long ticks, int scale) {
     float normalized = ((float) ticks - params.min_freq) / (params.max_freq - params.min_freq);
     int note = (int) (15 * normalized);
     float freq = 0;
-    if (note >= 0 && note < 8) {
+    if (note >= 0 && note < 9) {
         if (note <= 1) {
             note = 1;    
         }
@@ -162,7 +162,6 @@ static int16_t * update_frequency_song(ultrasound_device_t* dev, int16_t * prev,
     float normalized = ((float) ticks - params.min_freq) / (params.max_freq - params.min_freq);
     int note = (int) (9 * normalized);
     
-    printf("%ld \n", ticks);
     if (note < 2) {
        freq = (int16_t *) gwav_0->data;
     }
@@ -178,8 +177,7 @@ static int16_t * update_frequency_song(ultrasound_device_t* dev, int16_t * prev,
 }
 
 uint16_t ads_read_channel_vol(ads_device_t* dev, uint16_t prev_reading) {
-    uint16_t conversion_raw = ads_read_channel(dev);
-    
+    uint16_t conversion_raw = ads_read_channel(dev); 
     uint16_t converted = ((float) conversion_raw / 27000.0) * 8;
 
     if (converted > 8) {
@@ -236,7 +234,7 @@ void main(void) {
     interrupts_global_enable();
     
     // Initialize sound generation
-    int duration_ms = 150;
+    int duration_ms = 100;
     i2s_frame_type_t ftype = I2S_STEREO;
 
     // Set aside memory for samples
