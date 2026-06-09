@@ -13,9 +13,9 @@
 #include "interrupts.h"
 #include "gpio_interrupt.h"
 
-//#include "sound_files/Xmas_minus_6.h"
-//#include "sound_files/Xmas_original.h"
-//#include "sound_files/Xmas_plus_5.h"
+#include "sound_files/Xmas_minus_6.h"
+#include "sound_files/Xmas_original.h"
+#include "sound_files/Xmas_plus_5.h"
 
 typedef struct {
     float min_freq;
@@ -163,15 +163,15 @@ static int16_t * update_frequency_song(ultrasound_device_t* dev, int16_t * prev,
     int note = (int) (9 * normalized);
     
     printf("%ld \n", ticks);
-   // if (note < 2) {
-   //     freq = (int16_t *) gwav_0->data;
-   // }
-   // else if (note < 4) {
-   //     freq = (int16_t *) gwav_6->data;
-   // }  
-   // else if (note < 6) {
-   //     freq = (int16_t *) gwav_11->data;
-    //}
+    if (note < 2) {
+       freq = (int16_t *) gwav_0->data;
+    }
+    else if (note < 4) {
+       freq = (int16_t *) gwav_6->data;
+    }  
+    else if (note < 6) {
+        freq = (int16_t *) gwav_11->data;
+    }
 
     return freq;
 
@@ -265,20 +265,20 @@ void main(void) {
     while (true) {
         
         if (is_button_pressed(song_button)) {
-//                for (int i = 0; i < gwav_6->n_data - count; i+= count) {
-  //                  i2s_stream_playback_nb(&curr_samples[i], count, ftype);
-//		   
+                for (int i = 0; i < gwav_6->n_data - count; i+= count) {
+                    i2s_stream_playback_nb(&curr_samples[i], count, ftype);
+		   
 		    // double buff
-  //                  update_samples = update_frequency_song(dev_freq, update_samples, 50000);
- //	            curr_samples = update_samples; 
+                    update_samples = update_frequency_song(dev_freq, update_samples, 50000);
+	            curr_samples = update_samples; 
                     
 
-   //                 if (!is_button_pressed(song_button)) {
-     //                   i2s_await();
-       //                 break;
-         //           }
-           //         i2s_await();
-             //   }
+                    if (!is_button_pressed(song_button)) {
+                       i2s_await();
+                       break;
+                   }
+                   i2s_await();
+               }
         }
 
         else {
