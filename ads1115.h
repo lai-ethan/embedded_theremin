@@ -1,7 +1,7 @@
 /* File: ads1115.h
 * Author: Ethan Lai <ethanlai@stanford.edu>
 *
-* ads1115.h describes functions to convert analogic input to the ads module into digital output over a I2C protocl
+* ads1115.h describes functions to convert analogic input to the ads module into digital output over a I2C protocol
 */
 
 #include "i2c.h"

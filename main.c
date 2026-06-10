@@ -60,7 +60,7 @@ float major_scales[12][8] = {
 
 static void show_reading(unsigned long cm) {
     
-    if (cm > MAX_RANGE) return; // don't print anything if nothing deteted
+    if (cm > MAX_RANGE) return; // don't print anything if nothing deleted
     char buf[MAX_RANGE+1];
     memset(buf, '-', sizeof(buf));
     buf[cm] = '|';

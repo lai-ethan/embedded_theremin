@@ -42,6 +42,7 @@ static void handle_distance(void* aux_data) {
     }
 }
 
+// creates new ultrasound device connected to TRIG_GPIO and ECHO_GPIO
 ultrasound_device_t* ultrasound_new(gpio_id_t TRIG_GPIO, gpio_id_t ECHO_GPIO) {
     ultrasound_device_t* dev = malloc(sizeof(*dev));
 
@@ -91,7 +92,7 @@ unsigned long ultrasound_read(ultrasound_device_t* dev, int timeout) {
 }
 
 
-// wait 60ms between each reading to prevent corruption of reading
+// wrapper function that called ultrasound_read (normalizes values)
 unsigned long ultrasound_read_filtered(ultrasound_device_t* dev, int timeout) {
     unsigned long curr_read = ultrasound_read(dev, timeout);
     unsigned long ans = curr_read;
