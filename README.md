@@ -5,7 +5,7 @@ A digital theremin built with the Mango Pi.
 Ethan Lai & Jayden Chen
 
 ## Project description
-We created a theremine using two ultrasonic sensors. In addition to the original theremin experience for continuously adjusting pitch and volume, we added modes to play scales in different keys (discrete pitch), adjust vibrato, and play a song in different keys. For this, we added three additional buttons as well as two slide potentiometers. 
+We created a theremin using two ultrasonic sensors. In addition to simulating the original theremin experience with continuous pitch and volume, we added modes to play scales in different keys (discrete pitch), add vibrato, and play a song in different keys. For this, we used three additional buttons as well as two slide potentiometers.
 
 ## Member contribution
 
