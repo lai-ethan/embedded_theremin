@@ -29,6 +29,7 @@ void gen_sample_fast (int16_t samples[], int num_samples, float frequency, int a
 void gen_sample_fast_chord (int16_t samples[], int num_samples, float frequency, int amplitude, i2s_frame_type_t ftype, float vib_freq, float vib_depth);
 void sin_init(void);
 
+// Speaker Initialize
 void speaker_init (void) {
 
     dma_init();
@@ -37,6 +38,7 @@ void speaker_init (void) {
 
 }
 
+// Fill sin Table
 void sin_init(void) {
 
     sin_table = malloc(sizeof(float) * LUT_SIZE);
@@ -47,6 +49,7 @@ void sin_init(void) {
 
 }
 
+// Calculate number of samples for duration
 int count_num_samples (int duration_ms, i2s_frame_type_t ftype) {
 
     int num_samples = duration_ms * SAMPLE_RATE / 1000;
@@ -58,6 +61,7 @@ int count_num_samples (int duration_ms, i2s_frame_type_t ftype) {
     return num_samples;
 }
 
+// Generate audio sample
 void gen_sample_fast (int16_t samples[], int num_samples, float frequency, int amplitude, i2s_frame_type_t ftype, float vib_freq, float vib_depth) {
     
     float phase_step = LUT_SIZE * frequency / SAMPLE_RATE;
@@ -105,6 +109,7 @@ void gen_sample_fast (int16_t samples[], int num_samples, float frequency, int a
     
 }
 
+// Generate audio sample for a chord
 void gen_sample_fast_chord (int16_t samples[], int num_samples, float frequency, int amplitude, i2s_frame_type_t ftype, float vib_freq, float vib_depth) {
     
     float phase_step = LUT_SIZE * frequency / SAMPLE_RATE;

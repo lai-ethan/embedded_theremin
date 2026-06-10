@@ -69,6 +69,7 @@ static void show_reading(unsigned long cm) {
     // printf("%ld\n", cm);
 }
 
+// Ultrasound reading to frequencies for playing individual notes
 static float convert_ticks_frequency (unsigned long ticks) {
     ticks /= 80;
 
@@ -77,6 +78,7 @@ static float convert_ticks_frequency (unsigned long ticks) {
     return params.min_freq + ( curve * (params.max_freq - params.min_freq));
 }
 
+// Ultrasound reading to frequencies for playing a scale
 static float convert_ticks_frequency_scale (unsigned long ticks, int scale) {
     ticks /= 80;
 
@@ -93,6 +95,7 @@ static float convert_ticks_frequency_scale (unsigned long ticks, int scale) {
     return freq;
 }
 
+// Update frequency for notes
 static float update_frequency(ultrasound_device_t* dev, float prev_freq, int threshold) {
 
     unsigned long ticks = ultrasound_read_filtered(dev, threshold);
@@ -106,6 +109,7 @@ static float update_frequency(ultrasound_device_t* dev, float prev_freq, int thr
 
 }
 
+// Update frequency for chords
 static float update_frequency_scale(ultrasound_device_t* dev, float prev_freq, int threshold, int scale) {
 
     unsigned long ticks = ultrasound_read_filtered(dev, threshold);
@@ -119,7 +123,7 @@ static float update_frequency_scale(ultrasound_device_t* dev, float prev_freq, i
 
 }
 
-
+// Update amplitude for continuous
 static float update_amplitude(ultrasound_device_t* dev, float prev_amp, int threshold) {
 
     unsigned long ticks = ultrasound_read_filtered(dev, threshold);
@@ -133,6 +137,7 @@ static float update_amplitude(ultrasound_device_t* dev, float prev_amp, int thre
 
 }
 
+// Update amplitude for scale
 static float update_amplitude_scale(ultrasound_device_t* dev, float prev_amp, int threshold) {
 
     unsigned long ticks = ultrasound_read_filtered(dev, threshold);
@@ -152,6 +157,7 @@ static float update_amplitude_scale(ultrasound_device_t* dev, float prev_amp, in
 
 }
 
+// Update frequency of song
 static int16_t * update_frequency_song(ultrasound_device_t* dev, int16_t * prev, int threshold) {
 
     unsigned long ticks = ultrasound_read_filtered(dev, threshold);
@@ -176,6 +182,7 @@ static int16_t * update_frequency_song(ultrasound_device_t* dev, int16_t * prev,
 
 }
 
+// Convert fader reading to volume
 uint16_t ads_read_channel_vol(ads_device_t* dev, uint16_t prev_reading) {
     uint16_t conversion_raw = ads_read_channel(dev); 
     uint16_t converted = ((float) conversion_raw / 27000.0) * 8;
@@ -191,6 +198,7 @@ typedef struct {
     uint16_t vib_freq;
 } vib_params;
 
+// Conver fader reading to vibrato
 vib_params ads_read_channel_vib(ads_device_t* dev, vib_params prev) {
 
     uint16_t conversion_raw = ads_read_channel(dev);
